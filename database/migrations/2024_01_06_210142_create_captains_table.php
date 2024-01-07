@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('captains', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->text('availability');
+            $table->text('availability')->nullable();
             $table->timestamps();
         });
     }

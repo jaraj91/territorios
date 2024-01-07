@@ -8,4 +8,11 @@ use Illuminate\Database\Eloquent\Model;
 class Captain extends Model
 {
     use HasFactory;
+
+    protected $guarded = [];
+
+    protected $casts = [
+        'availability' => 'array',
+    ];
+
 }
