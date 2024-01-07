@@ -15,6 +15,8 @@ return new class extends Migration
             $table->id();
             $table->dateTime('date');
             $table->string('type');
+            $table->string('progress')->nullable();
+            $table->foreignId('program_id')->constrained();
             $table->foreignId('address_id')->constrained();
             $table->foreignId('captain_id')->constrained();
             $table->foreignId('territory_id')->constrained();
