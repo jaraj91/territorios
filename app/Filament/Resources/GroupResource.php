@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Enums\GroupStatus;
 use App\Filament\Filters\DateFilter;
 use App\Filament\Resources\GroupResource\Pages;
 use App\Models\Group;
@@ -13,10 +14,13 @@ use Filament\Tables;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 
 class GroupResource extends Resource
 {
     protected static ?string $model = Group::class;
+
+    protected static ?string $modelLabel = 'Progreso';
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
@@ -24,42 +28,14 @@ class GroupResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\DateTimePicker::make('date')
-                    ->native(false)
-                    ->seconds(false)
-                    ->minutesStep(15)
-                    ->required(),
-                Forms\Components\Select::make('address_id')
-                    ->relationship('address', 'address')
-                    ->createOptionForm([
-                        Forms\Components\TextInput::make('address')
-                            ->required(),
-                    ])
-                    ->required(),
-                Forms\Components\Select::make('captain_id')
-                    ->relationship('captain', 'name')
-                    ->createOptionForm([
-                        Forms\Components\TextInput::make('name')
-                            ->required(),
-                    ])
-                    ->required(),
-                Forms\Components\Select::make('territories')
-                    ->multiple()
-                    ->options(Territory::orderByRaw('CONVERT(name, SIGNED) asc')->pluck('name', 'id'))
-                    ->preload()
-                    ->required(),
-                Forms\Components\Select::make('type')
-                    ->options([
-                        'General' => 'General',
-                        'G1' => 'G1',
-                        'G2' => 'G2',
-                        'G3' => 'G3',
-                        'G4' => 'G4',
-                        'G5' => 'G5',
-                        'G6' => 'G6',
-                        'G7' => 'G7',
-                    ])
-                    ->required(),
+                Forms\Components\CheckboxList::make('progress')
+                    ->options(function (Model $record) {
+                        $sections = $record->territory->sections ?? [];
+                        return array_combine($sections, $sections);
+                    })
+                    ->columns(2)
+                    ->label('')
+                    ->bulkToggleable(),
             ]);
     }
 
@@ -70,11 +46,18 @@ class GroupResource extends Resource
                 Tables\Columns\TextColumn::make('date')
                     ->dateTime()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('address.address'),
+                Tables\Columns\TextColumn::make('address.address')
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('captain.name'),
                 Tables\Columns\TextColumn::make('territory.name')
                     ->numeric()
                     ->sortable(),
+                Tables\Columns\TextColumn::make('progress')
+                    ->badge(),
+                Tables\Columns\TextColumn::make('status')
+                    ->formatStateUsing(fn (GroupStatus $state) => $state->value)
+                    ->badge()
+                    ->color(fn (GroupStatus $state): string => $state?->color()),
                 Tables\Columns\TextColumn::make('type')
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('created_at')
@@ -100,7 +83,10 @@ class GroupResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\DeleteAction::make()
+                    ->using(function (Model $record) {
+                        $record->update(['progress' => null]);
+                    }),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
