@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\ProgramResource\RelationManagers;
 
+use App\Enums\GroupStatus;
 use App\Filament\Filters\DateFilter;
 use App\Models\Territory;
 use Filament\Forms;
@@ -82,6 +83,12 @@ class GroupsRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('territory.name')
                     ->numeric()
                     ->sortable(),
+                Tables\Columns\TextColumn::make('progress')
+                    ->badge(),
+                Tables\Columns\TextColumn::make('status')
+                    ->formatStateUsing(fn (GroupStatus $state) => $state->value)
+                    ->badge()
+                    ->color(fn (GroupStatus $state): string => $state?->color()),
                 Tables\Columns\TextColumn::make('type')
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('created_at')
@@ -119,8 +126,29 @@ class GroupsRelationManager extends RelationManager
                     }),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\EditAction::make()->iconButton(),
+                Tables\Actions\DeleteAction::make()->iconButton(),
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\EditAction::make()
+                        ->label('Ingresar Progreso')
+                        ->icon('heroicon-o-forward')
+                        ->color('success')
+                        ->form([
+                            Forms\Components\CheckboxList::make('progress')
+                                ->options(function (Model $record) {
+                                    $sections = $record->territory->sections ?? [];
+                                    return array_combine($sections, $sections);
+                                })
+                                ->columns(2)
+                                ->label('')
+                                ->bulkToggleable(),
+                        ]),
+                    Tables\Actions\DeleteAction::make()
+                        ->label('Borrar Progreso')
+                        ->using(function (Model $record) {
+                            $record->update(['progress' => null]);
+                        }),
+                ])
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

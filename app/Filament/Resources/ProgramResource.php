@@ -11,6 +11,7 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Collection;
 
 class ProgramResource extends Resource
 {
@@ -61,6 +62,10 @@ class ProgramResource extends Resource
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\BulkAction::make('report')
+                        ->label('Formulario S-13')
+                        ->icon('heroicon-o-clipboard-document-list')
+                        ->action(fn (Collection $records) => ''),
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ]);
