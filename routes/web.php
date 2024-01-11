@@ -1,6 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Spatie\LaravelPdf\Enums\Format;
+use function Spatie\LaravelPdf\Support\pdf;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,5 +16,12 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('programs_pdf');
+    $records = \App\Models\Group::with(['address', 'captain', 'territory'])->get()->groupBy([
+        fn ($item): string => $item->date->format('Y-m-d'),
+    ]);
+
+    return view('program', compact('records'))
+//        ->disk('public')
+//        ->save('programa.pdf');
+    ;
 });

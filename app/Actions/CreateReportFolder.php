@@ -22,6 +22,7 @@ class CreateReportFolder
 
         return pdf()
             ->format(Format::A4)
+            ->headerView('')
             ->view('programs_pdf')
             ->disk('public')
             ->save('programa.pdf');

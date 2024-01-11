@@ -15,7 +15,8 @@ class Group extends Model
     protected $guarded = [];
 
     protected $casts = [
-        'progress' => 'array'
+        'progress' => 'array',
+        'date' => 'datetime',
     ];
 
     public function address(): BelongsTo

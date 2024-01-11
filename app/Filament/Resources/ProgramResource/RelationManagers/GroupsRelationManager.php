@@ -24,6 +24,7 @@ class GroupsRelationManager extends RelationManager
     public function form(Form $form): Form
     {
         return $form
+            ->columns(1)
             ->schema([
                 Forms\Components\DateTimePicker::make('date')
                     ->native(false)
@@ -48,8 +49,7 @@ class GroupsRelationManager extends RelationManager
                     ->hidden(fn (string $operation) => $operation !== 'create')
                     ->multiple()
                     ->options(Territory::orderByRaw('CONVERT(name, SIGNED) asc')->pluck('name', 'id'))
-                    ->preload()
-                    ->required(),
+                    ->preload(),
                 Forms\Components\Select::make('territory_id')
                     ->hidden(fn (string $operation) => $operation !== 'edit')
                     ->options(Territory::orderByRaw('CONVERT(name, SIGNED) asc')->pluck('name', 'id'))
@@ -67,6 +67,8 @@ class GroupsRelationManager extends RelationManager
                         'G7' => 'G7',
                     ])
                     ->required(),
+                Forms\Components\Toggle::make('is_highlight_day'),
+                Forms\Components\Toggle::make('is_highlight_hour'),
             ]);
     }
 
@@ -126,10 +128,10 @@ class GroupsRelationManager extends RelationManager
                     }),
             ])
             ->actions([
-                Tables\Actions\EditAction::make()->iconButton(),
-                Tables\Actions\DeleteAction::make()->iconButton(),
+                Tables\Actions\EditAction::make('edit')->iconButton(),
+                Tables\Actions\DeleteAction::make('delete')->iconButton(),
                 Tables\Actions\ActionGroup::make([
-                    Tables\Actions\EditAction::make()
+                    Tables\Actions\EditAction::make('add-progress')
                         ->label('Ingresar Progreso')
                         ->icon('heroicon-o-forward')
                         ->color('success')
@@ -143,7 +145,7 @@ class GroupsRelationManager extends RelationManager
                                 ->label('')
                                 ->bulkToggleable(),
                         ]),
-                    Tables\Actions\DeleteAction::make()
+                    Tables\Actions\DeleteAction::make('remove-progress')
                         ->label('Borrar Progreso')
                         ->using(function (Model $record) {
                             $record->update(['progress' => null]);
