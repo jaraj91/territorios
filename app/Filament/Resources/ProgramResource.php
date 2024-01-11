@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Actions\CreateReportFolder;
 use App\Enums\Months;
 use App\Filament\Resources\ProgramResource\Pages;
 use App\Filament\Resources\ProgramResource\RelationManagers;
@@ -65,7 +66,7 @@ class ProgramResource extends Resource
                     Tables\Actions\BulkAction::make('report')
                         ->label('Formulario S-13')
                         ->icon('heroicon-o-clipboard-document-list')
-                        ->action(fn (Collection $records) => ''),
+                        ->action(fn (Collection $records) => app(CreateReportFolder::class, ['programs' => $records])->execute()),
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ]);
