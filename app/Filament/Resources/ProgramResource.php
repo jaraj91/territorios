@@ -6,6 +6,7 @@ use App\Actions\CreateReportFolder;
 use App\Enums\Months;
 use App\Filament\Resources\ProgramResource\Pages;
 use App\Filament\Resources\ProgramResource\RelationManagers;
+use App\Models\Group;
 use App\Models\Program;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -18,6 +19,8 @@ class ProgramResource extends Resource
 {
     protected static ?string $model = Program::class;
 
+    protected static ?string $label = 'Programa';
+
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
     public static function form(Form $form): Form
@@ -25,18 +28,23 @@ class ProgramResource extends Resource
         return $form
             ->schema([
                 Forms\Components\TextInput::make('year')
+                    ->label('Año')
                     ->minValue(2023)
                     ->maxValue(fn (Forms\Components\TextInput $component) => (int) date('Y') + 1)
                     ->required()
                     ->numeric(),
                 Forms\Components\Select::make('month')
+                    ->label('Mes')
                     ->options(Months::list())
                     ->native(false)
                     ->required(),
-                Forms\Components\TextInput::make('bg_primary'),
-                Forms\Components\TextInput::make('bg_secondary'),
+                Forms\Components\TextInput::make('bg_primary')
+                    ->label('Color principal'),
+                Forms\Components\TextInput::make('bg_secondary')
+                    ->label('Color secundario'),
                 Forms\Components\Textarea::make('comment')
-                ->columnSpan(2),
+                    ->label('Comentario')
+                    ->columnSpan(2),
             ]);
     }
 
@@ -45,27 +53,38 @@ class ProgramResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('year')
+                    ->label('Año')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('month')
+                    ->label('Mes')
                     ->formatStateUsing(fn (Months $state): string => $state->label())
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
+                    ->label('Creado en')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('updated_at')
+                    ->label('Actualizado en')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('year')
+                    ->label('Año')
                     ->options(Program::pluck('year', 'year')->unique()),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
                 Tables\Actions\ViewAction::make(),
+                Tables\Actions\Action::make('defaultProgress')
+                    ->label('Ingresar Progreso Completo')
+                    ->icon('heroicon-o-forward')
+                    ->color('success')
+                    ->requiresConfirmation()
+                    ->action(fn (Program $record) => $record->groups->each(fn (Group $group) => $group->progress ?? $group->update(['progress' => $group->territory->sections])))
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

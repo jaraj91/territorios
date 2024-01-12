@@ -14,16 +14,20 @@ class TerritoryResource extends Resource
 {
     protected static ?string $model = Territory::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $label = 'Territorios';
+
+    protected static ?string $navigationIcon = 'heroicon-m-map';
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
                 Forms\Components\TextInput::make('name')
+                    ->label('Nombre')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\TagsInput::make('sections'),
+                Forms\Components\TagsInput::make('sections')
+                ->label('Secciones'),
             ]);
     }
 
@@ -32,14 +36,18 @@ class TerritoryResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')
+                    ->label('Nombre')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('sections')
+                    ->label('Secciones')
                     ->badge(),
                 Tables\Columns\TextColumn::make('created_at')
+                    ->label('Creado en')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('updated_at')
+                    ->label('Actualizdo en')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),

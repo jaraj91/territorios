@@ -4,6 +4,7 @@ namespace App\Filament\Resources\ProgramResource\RelationManagers;
 
 use App\Enums\GroupStatus;
 use App\Filament\Filters\DateFilter;
+use App\Models\Group;
 use App\Models\Territory;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -13,6 +14,7 @@ use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Livewire\Component;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -21,12 +23,15 @@ class GroupsRelationManager extends RelationManager
 {
     protected static string $relationship = 'groups';
 
+    protected static ?string $label = 'Grupo de predicación';
+
     public function form(Form $form): Form
     {
         return $form
             ->columns(1)
             ->schema([
                 Forms\Components\DateTimePicker::make('date')
+                    ->label('Fecha y Hora')
                     ->native(false)
                     ->seconds(false)
                     ->minutesStep(15)
@@ -35,6 +40,7 @@ class GroupsRelationManager extends RelationManager
                     ->default(now()->format('d-m-Y 09:15'))
                     ->required(),
                 Forms\Components\Select::make('address_id')
+                    ->label('Dirección')
                     ->relationship('address', 'address')
                     ->createOptionForm([
                         Forms\Components\TextInput::make('address')
@@ -45,6 +51,7 @@ class GroupsRelationManager extends RelationManager
                     ->preload()
                     ->required(),
                 Forms\Components\Select::make('captain_id')
+                    ->label('Capitán')
                     ->relationship('captain', 'name')
                     ->createOptionForm([
                         Forms\Components\TextInput::make('name')
@@ -55,12 +62,14 @@ class GroupsRelationManager extends RelationManager
                     ->preload()
                     ->required(),
                 Forms\Components\Select::make('territories')
+                    ->label('Territorios')
                     ->hidden(fn (string $operation) => $operation !== 'create')
                     ->multiple()
                     ->options(Territory::orderByRaw('CONVERT(name, SIGNED) asc')->pluck('name', 'id'))
                     ->required()
                     ->preload(),
                 Forms\Components\Select::make('territory_id')
+                    ->label('Territorio')
                     ->hidden(fn (string $operation) => $operation !== 'edit')
                     ->options(Territory::orderByRaw('CONVERT(name, SIGNED) asc')->pluck('name', 'id'))
                     ->native(false)
@@ -68,6 +77,7 @@ class GroupsRelationManager extends RelationManager
                     ->preload()
                     ->required(),
                 Forms\Components\Select::make('type')
+                    ->label('Grupos de servicio')
                     ->options([
                         'General' => 'General',
                         'Grupo 1' => 'Grupo 1',
@@ -82,8 +92,10 @@ class GroupsRelationManager extends RelationManager
                     ->native(false)
                     ->searchable()
                     ->required(),
-                Forms\Components\Toggle::make('is_highlight_day'),
-                Forms\Components\Toggle::make('is_highlight_hour'),
+                Forms\Components\Toggle::make('is_highlight_day')
+                    ->label('¿Resaltar día completo?'),
+                Forms\Components\Toggle::make('is_highlight_hour')
+                ->label('¿Resaltar solo horario?'),
             ]);
     }
 
@@ -93,21 +105,28 @@ class GroupsRelationManager extends RelationManager
             ->recordTitleAttribute('date')
             ->columns([
                 Tables\Columns\TextColumn::make('date')
+                    ->label('Fecha')
                     ->dateTime()
                     ->formatStateUsing(fn ($state) => $state->format('d-m-Y H:i'))
                     ->sortable(),
-                Tables\Columns\TextColumn::make('address.address'),
-                Tables\Columns\TextColumn::make('captain.name'),
+                Tables\Columns\TextColumn::make('address.address')
+                    ->label('Dirección'),
+                Tables\Columns\TextColumn::make('captain.name')
+                    ->label('Capitán'),
                 Tables\Columns\TextColumn::make('territory.name')
+                    ->label('Territorio')
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('progress')
+                    ->label('Progreso')
                     ->badge(),
                 Tables\Columns\TextColumn::make('status')
+                    ->label('Estado')
                     ->formatStateUsing(fn (GroupStatus $state) => $state->value)
                     ->badge()
                     ->color(fn (GroupStatus $state): string => $state?->color()),
                 Tables\Columns\TextColumn::make('type')
+                    ->label('Grupo de servicio')
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
@@ -171,6 +190,12 @@ class GroupsRelationManager extends RelationManager
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\BulkAction::make('defaultProgress')
+                        ->label('Ingresar Progreso Completo')
+                        ->icon('heroicon-o-forward')
+                        ->color('success')
+                        ->deselectRecordsAfterCompletion()
+                        ->action(fn (Collection $records) => $records->each(fn (Group $group) => $group->progress ?? $group->update(['progress' => $group->territory->sections])))
                 ]),
             ]);
     }
