@@ -24,9 +24,9 @@
             </div>
         </header>
         <main>
-            @foreach($recordsGroupByDate as $date => $records)
+            @foreach($recordsGroupByDate as $records)
                 @php
-                $dateCarbon = \Illuminate\Support\Carbon::make($date);
+                $dateCarbon = \Illuminate\Support\Carbon::make($records->first()->date);
                 @endphp
                 <div @class([$bgPrimary => $records->first()->is_highlight_day, "grid grid-cols-7 grid-rows-{$records->count() }"])>
                     <x-pdf.cell class="row-span-{{ $records->count() }}">
@@ -37,11 +37,11 @@
                     </x-pdf.cell>
                     @foreach($records as $record)
                         @php
-                            $hour = $record->date->format('H:i');
+                            $hour = \Illuminate\Support\Carbon::make($record->date)->format('H:i');
                             $groups = $record->type;
-                            $address = $record->address->address;
-                            $captain = $record->captain->name;
-                            $territory = $record->territory->name;
+                            $address = $record->address;
+                            $captain = $record->captain;
+                            $territory = $record->territory;
                         @endphp
                         <x-pdf.cell @class([$bgPrimary => $record->is_highlight_hour])>{{ $hour }}</x-pdf.cell>
                         <x-pdf.cell @class([$bgPrimary => $record->is_highlight_hour])>{{ $groups }}</x-pdf.cell>
