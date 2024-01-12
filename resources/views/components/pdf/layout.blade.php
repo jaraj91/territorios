@@ -6,7 +6,7 @@
         <title>PDF</title>
         @vite('resources/css/app.css')
     </head>
-    <body class="font-sans" style="width: 210mm;">
+    <body class="font-sans text-sm" style="width: 210mm;">
         {{ $slot }}
     </body>
 </html>

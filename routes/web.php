@@ -17,10 +17,6 @@ use function Spatie\LaravelPdf\Support\pdf;
 */
 
 Route::get('/', function () {
-//    $records = \App\Models\Group::with(['address', 'captain', 'territory'])->get()->groupBy([
-//        fn ($item): string => $item->date->format('Y-m-d'),
-//    ]);
-
     $records = DB::table('groups')
         ->select(DB::raw("groups.date, groups.type, groups.is_highlight_day, groups.is_highlight_hour, addresses.address, captains.name as captain, GROUP_CONCAT(territories.name SEPARATOR ' - ') territory"))
         ->join('addresses', 'groups.address_id', '=', 'addresses.id')

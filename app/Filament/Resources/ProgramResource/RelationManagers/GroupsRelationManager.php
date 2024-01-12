@@ -30,6 +30,9 @@ class GroupsRelationManager extends RelationManager
                     ->native(false)
                     ->seconds(false)
                     ->minutesStep(15)
+                    ->displayFormat('d-m-Y H:i')
+                    ->closeOnDateSelection()
+                    ->default(now()->format('d-m-Y 09:15'))
                     ->required(),
                 Forms\Components\Select::make('address_id')
                     ->relationship('address', 'address')
@@ -37,6 +40,9 @@ class GroupsRelationManager extends RelationManager
                         Forms\Components\TextInput::make('address')
                             ->required(),
                     ])
+                    ->native(false)
+                    ->searchable()
+                    ->preload()
                     ->required(),
                 Forms\Components\Select::make('captain_id')
                     ->relationship('captain', 'name')
@@ -44,15 +50,21 @@ class GroupsRelationManager extends RelationManager
                         Forms\Components\TextInput::make('name')
                             ->required(),
                     ])
+                    ->native(false)
+                    ->searchable()
+                    ->preload()
                     ->required(),
                 Forms\Components\Select::make('territories')
                     ->hidden(fn (string $operation) => $operation !== 'create')
                     ->multiple()
                     ->options(Territory::orderByRaw('CONVERT(name, SIGNED) asc')->pluck('name', 'id'))
+                    ->required()
                     ->preload(),
                 Forms\Components\Select::make('territory_id')
                     ->hidden(fn (string $operation) => $operation !== 'edit')
                     ->options(Territory::orderByRaw('CONVERT(name, SIGNED) asc')->pluck('name', 'id'))
+                    ->native(false)
+                    ->searchable()
                     ->preload()
                     ->required(),
                 Forms\Components\Select::make('type')
@@ -66,6 +78,9 @@ class GroupsRelationManager extends RelationManager
                         'G6' => 'G6',
                         'G7' => 'G7',
                     ])
+                    ->default('General')
+                    ->native(false)
+                    ->searchable()
                     ->required(),
                 Forms\Components\Toggle::make('is_highlight_day'),
                 Forms\Components\Toggle::make('is_highlight_hour'),
