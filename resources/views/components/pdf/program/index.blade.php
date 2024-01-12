@@ -5,9 +5,10 @@
 @php
 $bgPrimary = $recordsGroupByDate->first()->first()->bg_primary ?? 'bg-red-300';
 $bgSecondary = $recordsGroupByDate->first()->first()->bg_secondary ?? 'bg-red-100';
+$comment = $recordsGroupByDate->first()->first()->comment ?? '';
 @endphp
 <x-pdf.layout>
-    <x-pdf.page class="border text-black {{ $bgSecondary }}">
+    <x-pdf.page class="text-black border-0">
         <header class="{{ $bgPrimary }}">
             <div class="text-center border border-amber-50">
                 <h1 class="font-bold uppercase">PROGRAMA DE PREDICACIÓN {{ \Illuminate\Support\Carbon::make($recordsGroupByDate->first()->first()->date)->monthName }} {{ \Illuminate\Support\Carbon::make($recordsGroupByDate->first()->first()->date)->year }}</h1>
@@ -23,7 +24,7 @@ $bgSecondary = $recordsGroupByDate->first()->first()->bg_secondary ?? 'bg-red-10
                 <x-pdf.program_cell class="col-span-2">TERRITORIOS</x-pdf.program_cell>
             </div>
         </header>
-        <main>
+        <main class="{{ $bgSecondary }}">
             @foreach($recordsGroupByDate as $records)
                 @php
                 $dateCarbon = \Illuminate\Support\Carbon::make($records->first()->date);
@@ -53,5 +54,10 @@ $bgSecondary = $recordsGroupByDate->first()->first()->bg_secondary ?? 'bg-red-10
                 </div>
             @endforeach
         </main>
+        @if (! empty($comment))
+        <footer class="mt-8 py-4 text-center font-bold {{ $bgPrimary }}">
+            {{ $comment }}
+        </footer>
+        @endif
     </x-pdf.page>
 </x-pdf.layout>
