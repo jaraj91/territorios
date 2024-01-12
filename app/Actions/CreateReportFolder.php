@@ -10,6 +10,7 @@ class CreateReportFolder
 {
     public function __construct(
         private Collection $programs,
+        private string $year,
         private CreateProgramPDF $programPDF,
         private CreateFormS13PDF $formPDF,
     ) {
@@ -17,14 +18,12 @@ class CreateReportFolder
 
     public function execute()
     {
-        $this->programPDF->execute();
-        $this->formPDF->execute();
+        $this->programPDF->execute($this->getProgramsId());
+        $this->formPDF->execute($this->getProgramsId(), $this->year);
+    }
 
-        return pdf()
-            ->format(Format::A4)
-            ->headerView('')
-            ->view('programs_pdf')
-            ->disk('public')
-            ->save('programa.pdf');
+    private function getProgramsId()
+    {
+        return $this->programs->pluck('id')->all();
     }
 }

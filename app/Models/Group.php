@@ -4,9 +4,11 @@ namespace App\Models;
 
 use App\Enums\GroupStatus;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Arr;
 
 class Group extends Model
 {
@@ -44,5 +46,10 @@ class Group extends Model
                 };
             }
         );
+    }
+
+    public function getPendingAttribute(): array
+    {
+        return array_diff($this->territory->sections, $this->progress);
     }
 }

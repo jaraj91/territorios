@@ -33,6 +33,10 @@ class ProgramResource extends Resource
                     ->options(Months::list())
                     ->native(false)
                     ->required(),
+                Forms\Components\TextInput::make('bg_primary'),
+                Forms\Components\TextInput::make('bg_secondary'),
+                Forms\Components\Textarea::make('comment')
+                ->columnSpan(2),
             ]);
     }
 
@@ -66,9 +70,13 @@ class ProgramResource extends Resource
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\BulkAction::make('report')
-                        ->label('Formulario S-13')
+                        ->label('Archivos Visita Super')
                         ->icon('heroicon-o-clipboard-document-list')
-                        ->action(fn (Collection $records) => app(CreateReportFolder::class, ['programs' => $records])->execute()),
+                        ->form([
+                            Forms\Components\TextInput::make('year')
+                            ->required()
+                        ])
+                        ->action(fn (Collection $records, array $data) => app(CreateReportFolder::class, ['programs' => $records, 'year' => $data['year']])->execute()),
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ]);

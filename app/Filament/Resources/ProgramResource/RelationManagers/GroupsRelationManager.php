@@ -94,6 +94,7 @@ class GroupsRelationManager extends RelationManager
             ->columns([
                 Tables\Columns\TextColumn::make('date')
                     ->dateTime()
+                    ->formatStateUsing(fn ($state) => $state->format('d-m-Y H:i'))
                     ->sortable(),
                 Tables\Columns\TextColumn::make('address.address'),
                 Tables\Columns\TextColumn::make('captain.name'),

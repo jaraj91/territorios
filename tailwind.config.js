@@ -11,10 +11,20 @@ export default {
     },
     {
       pattern: /row-span-.+/
+    },
+    {
+      pattern: /bg-.+/
     }
   ],
   theme: {
-    extend: {},
+    extend: {
+      gridTemplateColumns: {
+        '19': 'repeat(19, minmax(0, 1fr))',
+      },
+      fontSize: {
+        'xxs': ['0.65rem', '0.75rem'],
+      }
+    },
   },
   plugins: [],
 }
