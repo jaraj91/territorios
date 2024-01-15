@@ -25,6 +25,6 @@ ARG GROUP_ID
 RUN docker-php-serversideup-set-id www-data ${USER_ID} ${GROUP_ID}
 
 FROM base as deploy
-COPY --chown=www-data:www-data ./package.json ./package-lock.json ./postcss.conf.js ./tailwind.conf.js ./vite.config.js /var/www/html/
+COPY --chown=www-data:www-data ./package.json ./package-lock.json ./postcss.config.js ./tailwind.config.js ./vite.config.js /var/www/html/
 RUN npm ci && npm run build && npm cache clean --force
 COPY --chown=www-data:www-data . /var/www/html
