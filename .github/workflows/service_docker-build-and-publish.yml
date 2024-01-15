@@ -57,7 +57,7 @@ jobs:
         with:
           node-version: 18
       - name: Install Npm dependencies
-        run: npm install --production && npm run build
+        run: npm install && npm run build
       - name: Set env file
         run: |
           echo $BASE_64_SECRET | base64 -d > .env
