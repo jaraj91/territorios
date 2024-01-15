@@ -53,10 +53,10 @@ jobs:
           run \
           php \
           composer install --optimize-autoloader --no-interaction --no-progress --no-ansi
-      - name: Install Npm Dependencies
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 18
+      - name: Install Npm dependencies
         run: npm install --production && npm run build
       - name: Set env file
         run: |
