@@ -45,7 +45,7 @@ jobs:
           run \
           php \
           composer show --locked
-          
+
       - if: ${{ steps.composer-vendor-restore.outputs.cache-hit != 'true' }}
         name: Install Composer dependencies
         run: |
@@ -53,14 +53,18 @@ jobs:
           run \
           php \
           composer install --optimize-autoloader --no-interaction --no-progress --no-ansi
-      
+      - name: Install Npm Dependencies
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          run: npm install --production && npm run build
       - name: Set env file
         run: |
           echo $BASE_64_SECRET | base64 -d > .env
           chmod 600 .env
         env:
           BASE_64_SECRET: ${{ secrets.ENV_FILE_BASE64 }}
-      
+
       - name: docker-build-action
         uses: serversideup/github-action-docker-build@v5
         with:
