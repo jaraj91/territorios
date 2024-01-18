@@ -2,9 +2,9 @@
 
 namespace App\Actions;
 
-use App\Models\Program;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Spatie\Browsershot\Browsershot;
 use Spatie\LaravelPdf\Enums\Format;
 use function Spatie\LaravelPdf\Support\pdf;
 
@@ -28,6 +28,10 @@ class CreateProgramPDF
             ]);
 
         return pdf()
+            ->withBrowsershot(function (Browsershot $browsershot) {
+                $browsershot
+                    ->noSandbox();
+            })
             ->view('program', compact('pages'))
             ->format(Format::A4)
             ->margins(20, 20, 20, 20)

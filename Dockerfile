@@ -12,9 +12,8 @@ RUN apt-get update && apt-get install -y \
 RUN docker-php-ext-enable intl mbstring
 
 # Get NodeJS
-COPY --from=node:18.18.0-slim /usr/local/bin /usr/local/bin
-# Get npm
-COPY --from=node:18.18.0-slim /usr/local/lib/node_modules /usr/local/lib/node_modules
+RUN curl -sL https://deb.nodesource.com/setup_18.x | bash -
+RUN apt-get install -y nodejs
 
 FROM base as development
 
