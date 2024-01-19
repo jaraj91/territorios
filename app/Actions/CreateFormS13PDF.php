@@ -2,12 +2,9 @@
 
 namespace App\Actions;
 
-use function Spatie\LaravelPdf\Support\pdf;
-use Spatie\LaravelPdf\Enums\Format;
-
 class CreateFormS13PDF
 {
-    public function execute(array $programs, string $year)
+    public static function execute(array $programs, string $year)
     {
         $records = \App\Models\Group::with(['captain', 'territory'])
             ->where('progress', '!=', '[]')
@@ -47,13 +44,9 @@ class CreateFormS13PDF
 
         $results = collect($results)->groupBy('territory')->chunk(20);
 
-        return pdf()
-            ->view('s13form', [
-                'pages' => $results,
-                'year' => $year,
-            ])
-            ->format(Format::A4)
-            ->disk('local')
-            ->save('formularios_s13.pdf');
+        return view('s13form', [
+            'pages' => $results,
+            'year' => $year,
+        ]);
     }
 }

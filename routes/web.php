@@ -17,56 +17,8 @@ use function Spatie\LaravelPdf\Support\pdf;
 |
 */
 
-Route::get('/program', function () {
-    $records = DB::table('groups')
-        ->select(DB::raw("groups.date, groups.type, groups.is_highlight_day, groups.is_highlight_hour, addresses.address, captains.name as captain, GROUP_CONCAT(territories.name SEPARATOR ' - ') territory"))
-        ->join('addresses', 'groups.address_id', '=', 'addresses.id')
-        ->join('captains', 'groups.captain_id', '=', 'captains.id')
-        ->join('territories', 'groups.territory_id', '=', 'territories.id')
-        ->groupBy('date', 'type', 'addresses.address', 'captains.name', 'groups.is_highlight_day', 'groups.is_highlight_hour')
-        ->get()
-        ->groupBy(fn ($item) => \Illuminate\Support\Carbon::make($item->date)?->format('Y-m-d'));
-
-    return view('program', compact('records'));
+Route::middleware('auth')->group(function () {
+    Route::get('/pdf/program', [\App\Http\Controllers\PDFController::class, 'program'])->name('pdf_program');
+    Route::get('/pdf/s13form', [\App\Http\Controllers\PDFController::class, 's13form'])->name('pdf_s13form');
 });
 
-Route::get('/s13form', function () {
-    $records = \App\Models\Group::with(['captain', 'territory'])
-        ->where('progress', '!=', '[]')
-        ->where('progress', 'IS NOT', null)
-        ->get()
-        ->groupBy([
-            fn ($item) => $item->territory->name,
-        ])
-        ->sortBy(fn($value, $key) => (int) $key);
-
-    $results = [];
-
-    foreach ($records as $record) {
-        $pendingAccumulated = [];
-        $captain = '';
-        $dateStart = '';
-        foreach ($record as $item) {
-            if (empty($pendingAccumulated)) {
-                $captain = $item->captain->name;
-                $dateStart = $item->date->format('d-m-Y');
-                $pendingAccumulated = $item->pending;
-            } else {
-                $pendingAccumulated = array_diff($pendingAccumulated, $item->progress);
-            }
-
-            if (empty($pendingAccumulated)) {
-                $results[] = [
-                    'territory' => $item->territory->name,
-                    'captain' => $captain,
-                    'dateStart' => $dateStart,
-                    'dateEnd' => $item->date->format('d-m-Y'),
-                ];
-            }
-        }
-    }
-
-    $results = collect($results)->groupBy('territory')->chunk(20);
-
-    return view('s13form', ['pages' => $results]);
-});

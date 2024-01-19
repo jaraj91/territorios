@@ -2,7 +2,6 @@
 
 namespace App\Filament\Resources;
 
-use App\Actions\CreateReportFolder;
 use App\Enums\Months;
 use App\Filament\Resources\ProgramResource\Pages;
 use App\Filament\Resources\ProgramResource\RelationManagers;
@@ -88,14 +87,18 @@ class ProgramResource extends Resource
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\BulkAction::make('report')
-                        ->label('Archivos Visita Super')
+                    Tables\Actions\BulkAction::make('program_pdf')
+                        ->label('Ver PDF programa')
+                        ->icon('heroicon-o-clipboard-document-list')
+                        ->action(fn (Collection $records) => redirect(route('pdf_program', ['ids' => $records->pluck('id')->all()]))),
+                    Tables\Actions\BulkAction::make('s13form_pdf')
+                        ->label('Ver PDF formulario s13')
                         ->icon('heroicon-o-clipboard-document-list')
                         ->form([
                             Forms\Components\TextInput::make('year')
-                            ->required()
+                                ->required()
                         ])
-                        ->action(fn (Collection $records, array $data) => app(CreateReportFolder::class, ['programs' => $records, 'year' => $data['year']])->execute()),
+                        ->action(fn (Collection $records, array $data) => redirect(route('pdf_s13form', ['ids' => $records->pluck('id')->all(), 'year' => $data['year']]))),
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ]);
