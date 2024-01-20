@@ -7,6 +7,7 @@ use App\Filament\Resources\ProgramResource\Pages;
 use App\Filament\Resources\ProgramResource\RelationManagers;
 use App\Models\Group;
 use App\Models\Program;
+use Filament\Tables\Actions\ActionGroup;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -77,13 +78,14 @@ class ProgramResource extends Resource
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\Action::make('defaultProgress')
-                    ->label('Ingresar Progreso Completo')
-                    ->icon('heroicon-o-forward')
-                    ->color('success')
-                    ->requiresConfirmation()
-                    ->action(fn (Program $record) => $record->groups->each(fn (Group $group) => $group->progress ?? $group->update(['progress' => $group->territory->sections])))
+                ActionGroup::make([
+                    Tables\Actions\Action::make('defaultProgress')
+                        ->label('Ingresar Progreso Completo')
+                        ->icon('heroicon-o-forward')
+                        ->color('success')
+                        ->requiresConfirmation()
+                        ->action(fn (Program $record) => $record->groups->each(fn (Group $group) => $group->progress ?? $group->update(['progress' => $group->territory->sections])))
+                ])
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -117,7 +119,6 @@ class ProgramResource extends Resource
             'index' => Pages\ListPrograms::route('/'),
             'create' => Pages\CreateProgram::route('/create'),
             'edit' => Pages\EditProgram::route('/{record}/edit'),
-            'view' => Pages\ViewProgram::route('/{record}/view'),
         ];
     }
 }

@@ -6,7 +6,6 @@ FROM serversideup/php:beta-8.3-fpm-nginx as base
 RUN apt-get update && apt-get install -y \
     libicu-dev \
     libonig-dev \
-    && docker-php-ext-configure intl \
     && docker-php-ext-install intl \
     && docker-php-ext-install mbstring
 RUN docker-php-ext-enable intl mbstring

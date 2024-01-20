@@ -180,9 +180,11 @@ class GroupsRelationManager extends RelationManager
                                 ->label('')
                                 ->bulkToggleable(),
                         ]),
-                    Tables\Actions\DeleteAction::make('remove-progress')
+                    Tables\Actions\Action::make('remove-progress')
                         ->label('Borrar Progreso')
-                        ->using(function (Model $record) {
+                        ->icon('heroicon-o-bookmark-slash')
+                        ->requiresConfirmation()
+                        ->mountUsing(function (Model $record) {
                             $record->update(['progress' => null]);
                         }),
                 ])
