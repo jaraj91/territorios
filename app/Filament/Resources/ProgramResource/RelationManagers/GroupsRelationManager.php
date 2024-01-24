@@ -38,7 +38,7 @@ class GroupsRelationManager extends RelationManager
                     ->displayFormat('d-m-Y H:i')
                     ->default(function (Livewire $livewire) {
                         ['year' => $year, 'month' => $month] = $livewire->getOwnerRecord()->getAttributes();
-                        return Carbon::make("$year-$month-01");
+                        return Carbon::make("$year-$month-01 10:00");
                     })
                     ->minDate(function (Livewire $livewire) {
                         ['year' => $year, 'month' => $month] = $livewire->getOwnerRecord()->getAttributes();
