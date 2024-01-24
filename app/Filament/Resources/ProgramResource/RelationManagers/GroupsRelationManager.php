@@ -16,8 +16,8 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
-use Livewire\Component;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Carbon;
+use Livewire\Component as Livewire;
 
 class GroupsRelationManager extends RelationManager
 {
@@ -36,14 +36,25 @@ class GroupsRelationManager extends RelationManager
                     ->seconds(false)
                     ->minutesStep(15)
                     ->displayFormat('d-m-Y H:i')
-                    ->closeOnDateSelection()
-                    ->default(now()->format('d-m-Y 09:15'))
+                    ->default(function (Livewire $livewire) {
+                        ['year' => $year, 'month' => $month] = $livewire->getOwnerRecord()->getAttributes();
+                        return Carbon::make("$year-$month-01");
+                    })
+                    ->minDate(function (Livewire $livewire) {
+                        ['year' => $year, 'month' => $month] = $livewire->getOwnerRecord()->getAttributes();
+                        return Carbon::make("$year-$month-01");
+                    })
+                    ->maxDate(function (Livewire $livewire) {
+                        ['year' => $year, 'month' => $month] = $livewire->getOwnerRecord()->getAttributes();
+                        return Carbon::make("$year-$month-01")?->endOfMonth();
+                    })
                     ->required(),
                 Forms\Components\Select::make('address_id')
                     ->label('Dirección')
                     ->relationship('address', 'address')
                     ->createOptionForm([
                         Forms\Components\TextInput::make('address')
+                            ->label('Dirección')
                             ->required(),
                     ])
                     ->native(false)
@@ -55,6 +66,7 @@ class GroupsRelationManager extends RelationManager
                     ->relationship('captain', 'name')
                     ->createOptionForm([
                         Forms\Components\TextInput::make('name')
+                            ->label('Nombre')
                             ->required(),
                     ])
                     ->native(false)
@@ -80,6 +92,7 @@ class GroupsRelationManager extends RelationManager
                     ->label('Grupos de servicio')
                     ->options([
                         'General' => 'General',
+                        'Por grupos' => 'Por grupos',
                         'Grupo 1' => 'Grupo 1',
                         'Grupo 2' => 'Grupo 2',
                         'Grupo 3' => 'Grupo 3',
