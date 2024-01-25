@@ -21,7 +21,7 @@ class CaptainResource extends Resource
 
     protected static ?string $pluralLabel = 'Capitanes';
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-s-user-circle';
 
     public static function form(Form $form): Form
     {

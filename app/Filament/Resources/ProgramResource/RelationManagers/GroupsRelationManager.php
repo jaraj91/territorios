@@ -23,7 +23,7 @@ class GroupsRelationManager extends RelationManager
 {
     protected static string $relationship = 'groups';
 
-    protected static ?string $label = 'Grupo de predicación';
+    protected static ?string $label = 'Grupo';
 
     public function form(Form $form): Form
     {
