@@ -2,21 +2,26 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\TerritoryResource\Pages;
-use App\Models\Territory;
+use App\Filament\Resources\CaptainResource\Pages;
+use App\Filament\Resources\CaptainResource\RelationManagers;
+use App\Models\Captain;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class TerritoryResource extends Resource
+class CaptainResource extends Resource
 {
-    protected static ?string $model = Territory::class;
+    protected static ?string $model = Captain::class;
 
-    protected static ?string $label = 'Territorio';
+    protected static ?string $label = 'Capitán';
 
-    protected static ?string $navigationIcon = 'heroicon-m-map';
+    protected static ?string $pluralLabel = 'Capitanes';
+
+    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
     public static function form(Form $form): Form
     {
@@ -26,8 +31,10 @@ class TerritoryResource extends Resource
                     ->label('Nombre')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\TagsInput::make('sections')
-                ->label('Secciones'),
+                Forms\Components\Textarea::make('availability')
+                    ->label('Disponibilidad')
+                    ->maxLength(65535)
+                    ->columnSpanFull(),
             ]);
     }
 
@@ -38,16 +45,13 @@ class TerritoryResource extends Resource
                 Tables\Columns\TextColumn::make('name')
                     ->label('Nombre')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('sections')
-                    ->label('Secciones')
-                    ->badge(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Creado en')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('updated_at')
-                    ->label('Actualizdo en')
+                    ->label('Actualizado en')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -69,7 +73,7 @@ class TerritoryResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ManageTerritories::route('/'),
+            'index' => Pages\ManageCaptains::route('/'),
         ];
     }
 }

@@ -26,6 +26,10 @@ class ProgramResource extends Resource
     public static function form(Form $form): Form
     {
         return $form
+            ->columns([
+                'sm' => 1,
+                'md' => 2,
+            ])
             ->schema([
                 Forms\Components\TextInput::make('year')
                     ->label('Año')
@@ -36,6 +40,7 @@ class ProgramResource extends Resource
                 Forms\Components\Select::make('month')
                     ->label('Mes')
                     ->options(Months::list())
+                    ->searchable()
                     ->native(false)
                     ->required(),
                 Forms\Components\TextInput::make('bg_primary')
@@ -44,7 +49,10 @@ class ProgramResource extends Resource
                     ->label('Color secundario'),
                 Forms\Components\Textarea::make('comment')
                     ->label('Comentario')
-                    ->columnSpan(2),
+                    ->columnSpan([
+                        'sm' => 1,
+                        'md' => 2,
+                    ]),
             ]);
     }
 
