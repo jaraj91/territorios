@@ -18,6 +18,8 @@ class TerritoryResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-m-map';
 
+    protected static ?string $navigationGroup = 'Parametrización';
+
     public static function form(Form $form): Form
     {
         return $form

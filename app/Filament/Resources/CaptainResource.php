@@ -23,6 +23,8 @@ class CaptainResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-s-user-circle';
 
+    protected static ?string $navigationGroup = 'Parametrización';
+
     public static function form(Form $form): Form
     {
         return $form
