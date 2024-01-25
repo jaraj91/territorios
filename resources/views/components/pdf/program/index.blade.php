@@ -55,7 +55,7 @@ $comment = $recordsGroupByDate->first()->first()->comment ?? '';
             @endforeach
         </main>
         @if (! empty($comment))
-        <footer class="mt-8 py-4 text-center font-bold {{ $bgPrimary }}">
+        <footer class="py-4 text-center font-bold {{ $bgPrimary }}">
             {{ $comment }}
         </footer>
         @endif
