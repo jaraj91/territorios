@@ -28,7 +28,6 @@ $comment = $recordsGroupByDate->first()->first()->comment ?? '';
             @foreach($recordsGroupByDate as $records)
                 @php
                 $dateCarbon = \Illuminate\Support\Carbon::make($records->first()->date);
-                $hour = $dateCarbon->format('H:i');
                 $rowSpan = "row-span-{$records->count()}";
                 @endphp
                 <div @class([$bgPrimary => $records->first()->is_highlight_day, "grid grid-cols-12 grid-rows-{$records->count() }"])>
@@ -38,14 +37,15 @@ $comment = $recordsGroupByDate->first()->first()->comment ?? '';
                     <x-pdf.program_cell class="uppercase col-span-2 row-span-{{ $records->count() }}">
                         {{ $dateCarbon->dayName }}
                     </x-pdf.program_cell>
-                    <x-pdf.program_cell @class([$bgPrimary => $records->first()->is_highlight_hour, $rowSpan])>{{ $hour }}</x-pdf.program_cell>
                     @foreach($records as $record)
                         @php
+                            $hour = \Illuminate\Support\Carbon::make($record->date)->format('H:i');
                             $groups = $record->type;
                             $address = $record->address;
                             $captain = $record->captain;
                             $territory = $record->territory;
                         @endphp
+                        <x-pdf.program_cell @class([$bgPrimary => $record->is_highlight_hour])>{{ $hour }}</x-pdf.program_cell>
                         <x-pdf.program_cell @class([$bgPrimary => $record->is_highlight_hour])>{{ $groups }}</x-pdf.program_cell>
                         <x-pdf.program_cell @class([$bgPrimary => $record->is_highlight_hour, 'col-span-3'])>{{ $address }}</x-pdf.program_cell>
                         <x-pdf.program_cell @class([$bgPrimary => $record->is_highlight_hour, 'col-span-2'])>{{ $captain }}</x-pdf.program_cell>
