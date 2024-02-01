@@ -2,6 +2,8 @@
 
 namespace App\Actions;
 
+use Illuminate\Support\Collection;
+
 class CreateFormS13PDF
 {
     public static function execute(array $programs, string $year)
@@ -42,10 +44,14 @@ class CreateFormS13PDF
             }
         }
 
-        $results = collect($results)->groupBy('territory')->chunk(20);
+        $results = collect($results);
+        $results2 = $results->chunkWhile(function (array $value, int $key, Collection $chunk) {
+            return $value['territory'] == $chunk->last()['territory'] && $chunk->count() < 4;
+        });
+        $results3 = $results2->chunk(20);
 
         return view('s13form', [
-            'pages' => $results,
+            'pages' => $results3,
             'year' => $year,
         ]);
     }

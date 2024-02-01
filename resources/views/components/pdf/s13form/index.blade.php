@@ -20,31 +20,30 @@
             </section>
         </header>
         <main>
-            @foreach($records->chunk(4) as $territories)
-                @foreach($territories as $territory => $row)
-                    @php
-                    $lastIndex = $row->count() - 1;
+            @foreach($records as $territories)
+                @php
+                    $lastIndex = count($territories) - 1;
                     if ($lastIndex !== 3) {
                         $blankItems = array_fill($lastIndex, 3 - $lastIndex, array_fill_keys(['captain', 'dateStart', 'dateEnd'], ''));
-                        $row = [...$row, ...$blankItems];
+                        $territories = [...$territories, ...$blankItems];
                     }
-                    @endphp
-                    @foreach($row as $item)
-                        @if($loop->first)
-                            <div class="grid grid-cols-19 text-xs min-h-11">
-                                <section class="grid grid-cols-subgrid col-span-3 border-2 border-t-0 border-black">
-                                    <x-pdf.form_cell_terr>{{ $territory }}</x-pdf.form_cell_terr>
-                                    <x-pdf.form_cell_last_date></x-pdf.form_cell_last_date>
-                                </section>
-                                <section class="grid grid-cols-subgrid border-2 border-l-0 border-t-0 border-black" style="grid-column: span 16 / span 16;">
-                        @endif
-                                    <x-pdf.form_cell :captain="$item['captain']" :dateStart="$item['dateStart']" :dateEnd="$item['dateEnd']" />
-                        @if($loop->last)
-                                </section>
-                            </div>
-                        @endif
-                    @endforeach
+                @endphp
+                @foreach($territories as $item)
+                    @if($loop->first)
+                        <div class="grid grid-cols-19 text-xs min-h-11">
+                            <section class="grid grid-cols-subgrid col-span-3 border-2 border-t-0 border-black">
+                                <x-pdf.form_cell_terr>{{ $item['territory'] }}</x-pdf.form_cell_terr>
+                                <x-pdf.form_cell_last_date></x-pdf.form_cell_last_date>
+                            </section>
+                            <section class="grid grid-cols-subgrid border-2 border-l-0 border-t-0 border-black" style="grid-column: span 16 / span 16;">
+                    @endif
+                                <x-pdf.form_cell :captain="$item['captain']" :dateStart="$item['dateStart']" :dateEnd="$item['dateEnd']" />
+                    @if($loop->last)
+                            </section>
+                        </div>
+                    @endif
                 @endforeach
+
             @endforeach
 
             @for($i = 0; $i < 20 - $records->count(); $i++)
