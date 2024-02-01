@@ -53,8 +53,7 @@ services:
       # Change the keys below to your own keys
       AUTHORIZED_KEYS: >
         "# Start Keys
-         ssh-ed25519 1234567890abcdefghijklmnoqrstuvwxyz user-a
-         ssh-ed25519 abcdefghijklmnoqrstuvwxyz1234567890 user-b
+         ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHU/bUzEqHyUAs5E8k4fnKCEqlj/TD4GM5U2znBl0EAm javierjaraf91@gmail.com
          # End Keys"
       # Be sure to configure the allowed IP addresses too
       ALLOWED_IPS: "AllowUsers *@127.0.0.1"
