@@ -37,20 +37,24 @@ $comment = $recordsGroupByDate->first()->first()->comment ?? '';
                     <x-pdf.program_cell class="uppercase col-span-2 row-span-{{ $records->count() }}">
                         {{ $dateCarbon->dayName }}
                     </x-pdf.program_cell>
-                    @foreach($records as $record)
-                        @php
-                            $hour = \Illuminate\Support\Carbon::make($record->date)->format('H:i');
-                            $groups = $record->type;
-                            $address = $record->address;
-                            $captain = $record->captain;
-                            $territory = $record->territory;
-                        @endphp
-                        <x-pdf.program_cell @class([$bgPrimary => $record->is_highlight_hour])>{{ $hour }}</x-pdf.program_cell>
-                        <x-pdf.program_cell @class([$bgPrimary => $record->is_highlight_hour])>{{ $groups }}</x-pdf.program_cell>
-                        <x-pdf.program_cell @class([$bgPrimary => $record->is_highlight_hour, 'col-span-3'])>{{ $address }}</x-pdf.program_cell>
-                        <x-pdf.program_cell @class([$bgPrimary => $record->is_highlight_hour, 'col-span-2'])>{{ $captain }}</x-pdf.program_cell>
-                        <x-pdf.program_cell @class([$bgPrimary => $record->is_highlight_hour, 'col-span-2'])>{{ $territory }}</x-pdf.program_cell>
-                    @endforeach
+                    @if(null !== $records->first()->group_comment)
+                        <x-pdf.program_cell @class(['col-span-9 text-center font-bold'])>{{ $records->first()->group_comment }}</x-pdf.program_cell>
+                    @else
+                        @foreach($records as $record)
+                            @php
+                                $hour = \Illuminate\Support\Carbon::make($record->date)->format('H:i');
+                                $groups = $record->type;
+                                $address = $record->address;
+                                $captain = $record->captain;
+                                $territory = $record->territory;
+                            @endphp
+                            <x-pdf.program_cell @class([$bgPrimary => $record->is_highlight_hour])>{{ $hour }}</x-pdf.program_cell>
+                            <x-pdf.program_cell @class([$bgPrimary => $record->is_highlight_hour])>{{ $groups }}</x-pdf.program_cell>
+                            <x-pdf.program_cell @class([$bgPrimary => $record->is_highlight_hour, 'col-span-3'])>{{ $address }}</x-pdf.program_cell>
+                            <x-pdf.program_cell @class([$bgPrimary => $record->is_highlight_hour, 'col-span-2'])>{{ $captain }}</x-pdf.program_cell>
+                            <x-pdf.program_cell @class([$bgPrimary => $record->is_highlight_hour, 'col-span-2'])>{{ $territory }}</x-pdf.program_cell>
+                        @endforeach
+                    @endif
                 </div>
             @endforeach
         </main>

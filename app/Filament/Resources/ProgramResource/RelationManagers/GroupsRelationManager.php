@@ -49,6 +49,14 @@ class GroupsRelationManager extends RelationManager
                         return Carbon::make("$year-$month-01")?->endOfMonth();
                     })
                     ->required(),
+                Forms\Components\Toggle::make('only_comment')
+                    ->label('¿Ingresar sólo comentario?')
+                    ->formatStateUsing(fn (?Model $record) => $record?->only_comment)
+
+                    ->live(),
+                Forms\Components\Textarea::make('comment')
+                    ->label('Comentario')
+                    ->visible(fn (Forms\Get $get) => $get('only_comment')),
                 Forms\Components\Select::make('address_id')
                     ->label('Dirección')
                     ->relationship('address', 'address')
@@ -60,7 +68,8 @@ class GroupsRelationManager extends RelationManager
                     ->native(false)
                     ->searchable()
                     ->preload()
-                    ->required(),
+                    ->required()
+                    ->hidden(fn (Forms\Get $get) => $get('only_comment')),
                 Forms\Components\Select::make('captain_id')
                     ->label('Capitán')
                     ->relationship('captain', 'name')
@@ -72,17 +81,18 @@ class GroupsRelationManager extends RelationManager
                     ->native(false)
                     ->searchable()
                     ->preload()
-                    ->required(),
+                    ->required()
+                    ->hidden(fn (Forms\Get $get) => $get('only_comment')),
                 Forms\Components\Select::make('territories')
                     ->label('Territorios')
-                    ->hidden(fn (string $operation) => $operation !== 'create')
+                    ->hidden(fn (Forms\Get $get, string $operation) => $operation !== 'create' || $get('only_comment'))
                     ->multiple()
                     ->options(Territory::orderByRaw('CONVERT(name, SIGNED) asc')->pluck('name', 'id'))
                     ->required()
                     ->preload(),
                 Forms\Components\Select::make('territory_id')
                     ->label('Territorio')
-                    ->hidden(fn (string $operation) => $operation !== 'edit')
+                    ->hidden(fn (Forms\Get $get, string $operation) => $operation !== 'edit' || $get('only_comment'))
                     ->options(Territory::orderByRaw('CONVERT(name, SIGNED) asc')->pluck('name', 'id'))
                     ->native(false)
                     ->searchable()
@@ -104,11 +114,13 @@ class GroupsRelationManager extends RelationManager
                     ->default('General')
                     ->native(false)
                     ->searchable()
-                    ->required(),
+                    ->required()
+                    ->hidden(fn (Forms\Get $get) => $get('only_comment')),
                 Forms\Components\Toggle::make('is_highlight_day')
                     ->label('¿Resaltar día completo?'),
                 Forms\Components\Toggle::make('is_highlight_hour')
-                ->label('¿Resaltar solo horario?'),
+                    ->label('¿Resaltar solo horario?')
+                    ->hidden(fn (Forms\Get $get) => $get('only_comment')),
             ]);
     }
 
@@ -165,13 +177,21 @@ class GroupsRelationManager extends RelationManager
             ->headerActions([
                 Tables\Actions\CreateAction::make()
                     ->using(function (array $data, string $model, HasTable $livewire): Model {
-                        $territories = $data['territories'];
-                        unset($data['territories']);
+                        $useOnlyComment = $data['only_comment'];
+                        unset($data['only_comment']);
                         $data['program_id'] = $livewire->getOwnerRecord()->id;
-                        foreach ($territories as $territory) {
-                            $data['territory_id'] = $territory;
+
+                        if ($useOnlyComment) {
                             $lastObject = $model::create($data);
+                        } else {
+                            $territories = $data['territories'];
+                            unset($data['territories']);
+                            foreach ($territories as $territory) {
+                                $data['territory_id'] = $territory;
+                                $lastObject = $model::create($data);
+                            }
                         }
+
                         return $lastObject;
                     }),
             ])
@@ -186,7 +206,7 @@ class GroupsRelationManager extends RelationManager
                         ->form([
                             Forms\Components\CheckboxList::make('progress')
                                 ->options(function (Model $record) {
-                                    $sections = $record->territory->sections ?? [];
+                                    $sections = $record->territory?->sections ?? [];
                                     return array_combine($sections, $sections);
                                 })
                                 ->columns(2)
@@ -197,7 +217,7 @@ class GroupsRelationManager extends RelationManager
                         ->label('Borrar Progreso')
                         ->icon('heroicon-o-bookmark-slash')
                         ->requiresConfirmation()
-                        ->mountUsing(function (Model $record) {
+                        ->action(function (Model $record) {
                             $record->update(['progress' => null]);
                         }),
                 ])
@@ -210,7 +230,7 @@ class GroupsRelationManager extends RelationManager
                         ->icon('heroicon-o-forward')
                         ->color('success')
                         ->deselectRecordsAfterCompletion()
-                        ->action(fn (Collection $records) => $records->each(fn (Group $group) => $group->progress ?? $group->update(['progress' => $group->territory->sections])))
+                        ->action(fn (Collection $records) => $records->each(fn (Group $group) => $group->progress ?? $group->update(['progress' => $group->territory?->sections ?? []])))
                 ]),
             ]);
     }

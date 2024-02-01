@@ -14,7 +14,7 @@ class Group extends Model
 {
     use HasFactory;
 
-    protected $guarded = [];
+    protected $guarded = ['only_comment'];
 
     protected $casts = [
         'progress' => 'array',
@@ -51,5 +51,10 @@ class Group extends Model
     public function getPendingAttribute(): array
     {
         return array_diff($this->territory->sections, $this->progress);
+    }
+
+    public function getOnlyCommentAttribute(): bool
+    {
+        return ! is_null($this->comment);
     }
 }

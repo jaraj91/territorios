@@ -92,7 +92,7 @@ class ProgramResource extends Resource
                         ->icon('heroicon-o-forward')
                         ->color('success')
                         ->requiresConfirmation()
-                        ->action(fn (Program $record) => $record->groups->each(fn (Group $group) => $group->progress ?? $group->update(['progress' => $group->territory->sections])))
+                        ->action(fn (Program $record) => $record->groups->each(fn (Group $group) => $group->progress ?? $group->update(['progress' => $group->territory?->sections ?? []])))
                 ])
             ])
             ->bulkActions([
